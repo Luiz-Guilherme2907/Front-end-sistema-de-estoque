@@ -1,12 +1,24 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Package } from 'lucide-react'
 import { registrar } from '@/api/auth'
 import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <span
+    style={{
+      display: 'block',
+      fontFamily: 'Syne, sans-serif',
+      fontSize: '9px',
+      fontWeight: 600,
+      letterSpacing: '0.2em',
+      textTransform: 'uppercase' as const,
+      color: 'hsl(var(--muted-foreground))',
+      marginBottom: '8px',
+    }}
+  >
+    {children}
+  </span>
+)
 
 export function Register() {
   const { signIn } = useAuth()
@@ -26,69 +38,186 @@ export function Register() {
       signIn(data)
       navigate('/dashboard')
     } catch {
-      setError('Erro ao criar conta. Verifique os dados.')
+      setError('Erro ao criar conta. Verifique os dados informados.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <Package className="h-8 w-8 text-blue-600" />
+    <div
+      className="bg-dot-grid"
+      style={{
+        minHeight: '100vh',
+        background: 'hsl(var(--background))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '360px' }}>
+        {/* Header */}
+        <div
+          className="animate-fade-up delay-0"
+          style={{ textAlign: 'center', marginBottom: '32px' }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '52px',
+              height: '52px',
+              border: '1px solid hsl(var(--amber) / 0.4)',
+              marginBottom: '18px',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                inset: '-6px',
+                border: '1px solid hsl(var(--amber) / 0.1)',
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: 800,
+                fontSize: '22px',
+                color: 'hsl(var(--amber))',
+              }}
+            >
+              E
+            </span>
           </div>
-          <CardTitle>Criar Conta</CardTitle>
-          <p className="text-sm text-gray-500">Registre-se para acessar o sistema</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="nome">Nome</Label>
-              <Input
-                id="nome"
-                placeholder="Seu nome"
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: 'Syne, sans-serif',
+              fontSize: '20px',
+              fontWeight: 700,
+              color: 'hsl(var(--foreground))',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Criar Conta
+          </h1>
+          <p
+            style={{
+              margin: '6px 0 0',
+              fontFamily: 'Martian Mono, monospace',
+              fontSize: '10px',
+              letterSpacing: '0.2em',
+              color: 'hsl(var(--muted-foreground))',
+              textTransform: 'uppercase',
+            }}
+          >
+            Novo Acesso ao Sistema
+          </p>
+        </div>
+
+        {/* Panel */}
+        <div className="panel animate-fade-up delay-1" style={{ padding: '26px' }}>
+          {/* Terminal bar */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              paddingBottom: '18px',
+              marginBottom: '20px',
+              borderBottom: '1px solid hsl(var(--border))',
+            }}
+          >
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'hsl(6 78% 50% / 0.55)', display: 'inline-block' }} />
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'hsl(38 88% 52% / 0.55)', display: 'inline-block' }} />
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'hsl(152 58% 40% / 0.55)', display: 'inline-block' }} />
+            <span
+              style={{
+                marginLeft: '10px',
+                fontFamily: 'Martian Mono, monospace',
+                fontSize: '9px',
+                letterSpacing: '0.18em',
+                color: 'hsl(var(--muted-foreground))',
+              }}
+            >
+              AUTH.REGISTER
+            </span>
+          </div>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div>
+              <Label>Nome</Label>
+              <input
+                type="text"
+                className="input-terminal"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
+                placeholder="Seu nome completo"
                 required
+                autoComplete="name"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
+
+            <div>
+              <Label>Email</Label>
+              <input
                 type="email"
-                placeholder="seu@email.com"
+                className="input-terminal"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="usuario@empresa.com"
                 required
+                autoComplete="email"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="senha">Senha</Label>
-              <Input
-                id="senha"
+
+            <div>
+              <Label>Senha</Label>
+              <input
                 type="password"
-                placeholder="••••••••"
+                className="input-terminal"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
+                placeholder="••••••••"
                 required
+                autoComplete="new-password"
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Criando...' : 'Criar Conta'}
-            </Button>
+
+            {error && <div className="error-box">{error}</div>}
+
+            <button
+              type="submit"
+              className="btn-amber"
+              disabled={loading}
+              style={{ width: '100%', marginTop: '4px' }}
+            >
+              {loading ? '▸ Criando conta...' : '▸ Registrar'}
+            </button>
           </form>
-          <p className="mt-4 text-center text-sm text-gray-500">
-            Já tem conta?{' '}
-            <Link to="/login" className="text-blue-600 hover:underline">
+
+          <p
+            style={{
+              textAlign: 'center',
+              marginTop: '18px',
+              fontFamily: 'Martian Mono, monospace',
+              fontSize: '11px',
+              color: 'hsl(var(--muted-foreground))',
+            }}
+          >
+            Já tem acesso?{' '}
+            <Link
+              to="/login"
+              style={{ color: 'hsl(var(--amber))', textDecoration: 'none' }}
+            >
               Entrar
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
