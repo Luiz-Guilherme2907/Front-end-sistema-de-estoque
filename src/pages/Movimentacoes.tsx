@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, TrendingUp, TrendingDown, ArrowLeftRight, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import { listarMovimentacoes, registrarMovimentacao, listarHistorico } from '@/api/movimentacoes'
 import type { HistoricoFiltros } from '@/api/movimentacoes'
@@ -28,7 +29,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   background: 'hsl(var(--input))',
   border: '1px solid hsl(var(--border))',
-  borderRadius: '2px',
+  borderRadius: '6px',
   padding: '8px 10px',
   color: 'hsl(var(--foreground))',
   fontFamily: 'Martian Mono, monospace',
@@ -45,9 +46,24 @@ const blurBorder = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) =
   e.currentTarget.style.borderColor = 'hsl(var(--border))'
 }
 
+function SkeletonRow() {
+  return (
+    <tr>
+      <td><div className="skeleton" style={{ width: '64px', height: '20px', borderRadius: '20px' }} /></td>
+      <td><div className="skeleton" style={{ width: '40px', height: '13px', borderRadius: '4px' }} /></td>
+      <td><div className="skeleton" style={{ width: '100px', height: '13px', borderRadius: '4px' }} /></td>
+      <td><div className="skeleton" style={{ width: '88px', height: '13px', borderRadius: '4px' }} /></td>
+    </tr>
+  )
+}
+
 function MovimentacaoRow({ m, i }: { m: MovimentacaoResponse; i: number }) {
   return (
-    <tr className="row-anim" style={{ animationDelay: `${i * 35}ms` }}>
+    <motion.tr
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+    >
       <td>
         <span className={m.tipo === 'ENTRADA' ? 'badge badge-entrada' : 'badge badge-saida'}>
           {m.tipo === 'ENTRADA'
@@ -67,7 +83,7 @@ function MovimentacaoRow({ m, i }: { m: MovimentacaoResponse; i: number }) {
           hour: '2-digit', minute: '2-digit',
         })}
       </td>
-    </tr>
+    </motion.tr>
   )
 }
 
@@ -119,7 +135,7 @@ function HistoricoAdmin({ produtos }: { produtos: ProdutoResponse[] }) {
   const currentPage = filtros.page ?? 0
 
   return (
-    <div className="panel animate-fade-in">
+    <div className="panel">
       {/* Header */}
       <div className="panel-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -133,16 +149,25 @@ function HistoricoAdmin({ produtos }: { produtos: ProdutoResponse[] }) {
               color: 'hsl(var(--amber))',
               background: 'hsl(var(--amber) / 0.1)',
               border: '1px solid hsl(var(--amber) / 0.25)',
-              borderRadius: '2px',
-              padding: '2px 6px',
+              borderRadius: '20px',
+              padding: '2px 8px',
             }}
           >
             ADMIN
           </span>
         </div>
-        <span style={{ fontFamily: 'Martian Mono, monospace', fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}>
-          {totalElements} registros
-        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={totalElements}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2 }}
+            style={{ fontFamily: 'Martian Mono, monospace', fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}
+          >
+            {totalElements} registros
+          </motion.span>
+        </AnimatePresence>
       </div>
 
       {/* Filtros */}
@@ -221,27 +246,72 @@ function HistoricoAdmin({ produtos }: { produtos: ProdutoResponse[] }) {
       </div>
 
       {/* Tabela */}
-      {error ? (
-        <div className="loading-state" style={{ color: 'hsl(6 78% 68%)' }}>{error}</div>
-      ) : loading ? (
-        <div className="loading-state">▸ Carregando histórico...</div>
-      ) : movs.length === 0 ? (
-        <div className="loading-state">Nenhuma movimentação encontrada com estes filtros.</div>
-      ) : (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Quantidade</th>
-              <th>Observação</th>
-              <th>Data / Hora</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movs.map((m, i) => <MovimentacaoRow key={m.id} m={m} i={i} />)}
-          </tbody>
-        </table>
-      )}
+      <AnimatePresence mode="wait">
+        {error ? (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="loading-state"
+            style={{ color: 'hsl(6 78% 68%)' }}
+          >
+            {error}
+          </motion.div>
+        ) : loading ? (
+          <motion.table
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="data-table"
+          >
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Observação</th>
+                <th>Data / Hora</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(5)].map((_, i) => <SkeletonRow key={i} />)}
+            </tbody>
+          </motion.table>
+        ) : movs.length === 0 ? (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="loading-state"
+          >
+            Nenhuma movimentação encontrada com estes filtros.
+          </motion.div>
+        ) : (
+          <motion.table
+            key="data"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="data-table"
+          >
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Observação</th>
+                <th>Data / Hora</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movs.map((m, i) => <MovimentacaoRow key={m.id} m={m} i={i} />)}
+            </tbody>
+          </motion.table>
+        )}
+      </AnimatePresence>
 
       {/* Paginação */}
       {totalPages > 1 && (
@@ -285,6 +355,7 @@ function HistoricoAdmin({ produtos }: { produtos: ProdutoResponse[] }) {
 export function Movimentacoes() {
   const { isAdmin } = useAuth()
   const [produtos, setProdutos] = useState<ProdutoResponse[]>([])
+  const [produtosLoading, setProdutosLoading] = useState(true)
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoResponse[]>([])
   const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -300,12 +371,13 @@ export function Movimentacoes() {
   useEffect(() => {
     listarProdutos(0, 100).then((p) => {
       setProdutos(p.content.filter((pr) => pr.ativo))
-    })
+    }).finally(() => setProdutosLoading(false))
   }, [])
 
   const loadMovs = (id: number) => {
     setSelectedProdutoId(id)
     setLoading(true)
+    setMovimentacoes([])
     listarMovimentacoes(id)
       .then((p) => setMovimentacoes(p.content))
       .finally(() => setLoading(false))
@@ -329,8 +401,10 @@ export function Movimentacoes() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div
-        className="animate-fade-up delay-0"
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}
       >
         <div>
@@ -363,7 +437,7 @@ export function Movimentacoes() {
             style={{
               background: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
-              borderRadius: '3px',
+              borderRadius: '16px',
               maxWidth: '400px',
             }}
           >
@@ -382,7 +456,6 @@ export function Movimentacoes() {
             </DialogHeader>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '4px' }}>
-              {/* Product select */}
               <div>
                 <FieldLabel>Produto</FieldLabel>
                 <select
@@ -399,7 +472,6 @@ export function Movimentacoes() {
                 </select>
               </div>
 
-              {/* Tipo */}
               <div>
                 <FieldLabel>Tipo</FieldLabel>
                 <div style={{ display: 'flex', gap: '10px' }}>
@@ -412,7 +484,7 @@ export function Movimentacoes() {
                         flex: 1,
                         padding: '10px 0',
                         border: '1px solid',
-                        borderRadius: '2px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         fontFamily: 'Syne, sans-serif',
                         fontSize: '10px',
@@ -426,21 +498,9 @@ export function Movimentacoes() {
                         transition: 'all 0.15s ease',
                         ...(form.tipo === t
                           ? t === 'ENTRADA'
-                            ? {
-                                background: 'hsl(152 58% 40% / 0.14)',
-                                color: 'hsl(152 58% 62%)',
-                                borderColor: 'hsl(152 58% 40% / 0.4)',
-                              }
-                            : {
-                                background: 'hsl(6 78% 56% / 0.12)',
-                                color: 'hsl(6 78% 68%)',
-                                borderColor: 'hsl(6 78% 56% / 0.4)',
-                              }
-                          : {
-                              background: 'transparent',
-                              color: 'hsl(var(--muted-foreground))',
-                              borderColor: 'hsl(var(--border))',
-                            }),
+                            ? { background: 'hsl(152 58% 40% / 0.14)', color: 'hsl(152 58% 62%)', borderColor: 'hsl(152 58% 40% / 0.4)' }
+                            : { background: 'hsl(6 78% 56% / 0.12)', color: 'hsl(6 78% 68%)', borderColor: 'hsl(6 78% 56% / 0.4)' }
+                          : { background: 'transparent', color: 'hsl(var(--muted-foreground))', borderColor: 'hsl(var(--border))' }),
                       }}
                     >
                       {t === 'ENTRADA'
@@ -452,7 +512,6 @@ export function Movimentacoes() {
                 </div>
               </div>
 
-              {/* Quantidade */}
               <div>
                 <FieldLabel>Quantidade</FieldLabel>
                 <input
@@ -466,7 +525,6 @@ export function Movimentacoes() {
                 />
               </div>
 
-              {/* Observação */}
               <div>
                 <FieldLabel>Observação</FieldLabel>
                 <input
@@ -480,9 +538,7 @@ export function Movimentacoes() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '4px' }}>
-                <button className="btn-ghost" onClick={() => setOpen(false)}>
-                  Cancelar
-                </button>
+                <button className="btn-ghost" onClick={() => setOpen(false)}>Cancelar</button>
                 <button
                   className="btn-amber"
                   onClick={handleSave}
@@ -494,102 +550,169 @@ export function Movimentacoes() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
 
-      {/* Product chips */}
-      {produtos.length > 0 && (
-        <div
-          className="animate-fade-up delay-1"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-            gap: '10px',
-          }}
-        >
-          {produtos.map((p, i) => (
-            <button
-              key={p.id}
-              className={`product-chip row-anim${selectedProdutoId === p.id ? ' selected' : ''}`}
-              style={{ animationDelay: `${i * 35}ms` }}
-              onClick={() => loadMovs(p.id)}
-            >
-              <p
+      {/* Product chips — skeleton while loading */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.07 }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gap: '10px',
+        }}
+      >
+        {produtosLoading
+          ? [...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.04, ease: 'easeOut' }}
                 style={{
-                  margin: 0,
-                  fontFamily: 'Syne, sans-serif',
-                  fontWeight: 600,
-                  fontSize: '12px',
-                  color: selectedProdutoId === p.id ? 'hsl(var(--amber))' : 'hsl(var(--foreground))',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {p.nome}
-              </p>
-              <p
-                style={{
-                  margin: '4px 0 0',
-                  fontFamily: 'Martian Mono, monospace',
-                  fontSize: '10px',
-                  color: p.quantidade <= 5
-                    ? 'hsl(var(--warn-fg))'
-                    : 'hsl(var(--muted-foreground))',
+                  background: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  minHeight: '60px',
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  justifyContent: 'center',
                 }}
               >
-                {p.quantidade <= 5 && <span className="low-stock-dot" style={{ width: '5px', height: '5px' }} />}
-                {p.quantidade} un.
-              </p>
-            </button>
-          ))}
-        </div>
-      )}
+                <div className="skeleton" style={{ height: '13px', width: '80%', borderRadius: '4px' }} />
+                <div className="skeleton" style={{ height: '10px', width: '50%', borderRadius: '4px' }} />
+              </motion.div>
+            ))
+          : produtos.map((p, i) => (
+              <motion.button
+                key={p.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className={`product-chip${selectedProdutoId === p.id ? ' selected' : ''}`}
+                onClick={() => loadMovs(p.id)}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontFamily: 'Syne, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '12px',
+                    color: selectedProdutoId === p.id ? 'hsl(var(--amber))' : 'hsl(var(--foreground))',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {p.nome}
+                </p>
+                <p
+                  style={{
+                    margin: '4px 0 0',
+                    fontFamily: 'Martian Mono, monospace',
+                    fontSize: '10px',
+                    color: p.quantidade <= 5 ? 'hsl(var(--warn-fg))' : 'hsl(var(--muted-foreground))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  {p.quantidade <= 5 && <span className="low-stock-dot" style={{ width: '5px', height: '5px' }} />}
+                  {p.quantidade} un.
+                </p>
+              </motion.button>
+            ))
+        }
+      </motion.div>
 
       {/* Movement table — por produto */}
-      {selectedProdutoId && (
-        <div className="panel animate-fade-in">
-          <div className="panel-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <ArrowLeftRight size={13} color="hsl(var(--amber))" />
-              <span className="panel-label">
-                Histórico — {selectedProduct?.nome ?? '...'}
-              </span>
+      <AnimatePresence>
+        {selectedProdutoId && (
+          <motion.div
+            className="panel"
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="panel-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ArrowLeftRight size={13} color="hsl(var(--amber))" />
+                <span className="panel-label">
+                  Histórico — {selectedProduct?.nome ?? '...'}
+                </span>
+              </div>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={movimentacoes.length}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ fontFamily: 'Martian Mono, monospace', fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}
+                >
+                  {loading ? '...' : `${movimentacoes.length} registros`}
+                </motion.span>
+              </AnimatePresence>
             </div>
-            <span
-              style={{
-                fontFamily: 'Martian Mono, monospace',
-                fontSize: '10px',
-                color: 'hsl(var(--muted-foreground))',
-              }}
-            >
-              {movimentacoes.length} registros
-            </span>
-          </div>
 
-          {loading ? (
-            <div className="loading-state">▸ Carregando movimentações...</div>
-          ) : movimentacoes.length === 0 ? (
-            <div className="loading-state">Nenhuma movimentação registrada para este produto.</div>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Tipo</th>
-                  <th>Quantidade</th>
-                  <th>Observação</th>
-                  <th>Data / Hora</th>
-                </tr>
-              </thead>
-              <tbody>
-                {movimentacoes.map((m, i) => <MovimentacaoRow key={m.id} m={m} i={i} />)}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.table
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="data-table"
+                >
+                  <thead>
+                    <tr>
+                      <th>Tipo</th><th>Quantidade</th><th>Observação</th><th>Data / Hora</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(4)].map((_, i) => <SkeletonRow key={i} />)}
+                  </tbody>
+                </motion.table>
+              ) : movimentacoes.length === 0 ? (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="loading-state"
+                >
+                  Nenhuma movimentação registrada para este produto.
+                </motion.div>
+              ) : (
+                <motion.table
+                  key="data"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="data-table"
+                >
+                  <thead>
+                    <tr>
+                      <th>Tipo</th><th>Quantidade</th><th>Observação</th><th>Data / Hora</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {movimentacoes.map((m, i) => <MovimentacaoRow key={m.id} m={m} i={i} />)}
+                  </tbody>
+                </motion.table>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Histórico Geral — somente ADMIN */}
       {isAdmin && <HistoricoAdmin produtos={produtos} />}

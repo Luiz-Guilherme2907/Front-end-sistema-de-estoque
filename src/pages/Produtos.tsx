@@ -31,7 +31,7 @@ const FieldInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
       width: '100%',
       background: 'hsl(var(--input))',
       border: '1px solid hsl(var(--border))',
-      borderRadius: '2px',
+      borderRadius: '6px',
       padding: '8px 10px',
       color: 'hsl(var(--foreground))',
       fontFamily: 'Martian Mono, monospace',
@@ -105,8 +105,10 @@ export function Produtos() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div
-        className="animate-fade-up delay-0"
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}
       >
         <div>
@@ -137,12 +139,20 @@ export function Produtos() {
           <Plus size={13} />
           Novo Produto
         </motion.button>
-      </div>
+      </motion.div>
 
       {/* Table panel */}
-      <div className="panel animate-fade-up delay-1">
+      <motion.div
+        className="panel"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.07 }}
+      >
         <div className="panel-header">
-          <span className="panel-label">Lista de Produtos</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Package size={13} color="hsl(var(--amber))" />
+            <span className="panel-label">Lista de Produtos</span>
+          </div>
           <span
             style={{
               fontFamily: 'Martian Mono, monospace',
@@ -287,7 +297,7 @@ export function Produtos() {
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* ── Modal ── */}
       <AnimatePresence>

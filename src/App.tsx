@@ -7,6 +7,7 @@ import { Register } from '@/pages/Register'
 import { Dashboard } from '@/pages/Dashboard'
 import { Produtos } from '@/pages/Produtos'
 import { Movimentacoes } from '@/pages/Movimentacoes'
+import { Profile } from '@/pages/Profile'
 
 function PrivateRoute() {
   const { user } = useAuth()
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/produtos" element={<Produtos />} />
                 <Route path="/movimentacoes" element={<Movimentacoes />} />
+                <Route path="/perfil" element={<Profile />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

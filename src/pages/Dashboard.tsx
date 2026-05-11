@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { Package, CheckCircle2, XCircle, AlertTriangle, TrendingDown } from 'lucide-react'
 import { listarProdutos } from '@/api/produtos'
 import type { ProdutoResponse } from '@/types'
@@ -165,6 +166,7 @@ export function Dashboard() {
   const [produtos, setProdutos] = useState<ProdutoResponse[]>([])
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     listarProdutos(0, 100)
@@ -258,17 +260,28 @@ export function Dashboard() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span style={{
-            fontFamily: 'Syne, sans-serif',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'hsl(var(--muted-foreground))',
-          }}>
-            Produtos Recentes
-          </span>
-          <TrendingDown size={13} color="hsl(var(--muted-foreground))" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <TrendingDown size={13} color="hsl(var(--amber))" />
+            <span style={{
+              fontFamily: 'Syne, sans-serif',
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'hsl(var(--muted-foreground))',
+            }}>
+              Produtos Recentes
+            </span>
+          </div>
+          <motion.button
+            className="btn-ghost"
+            onClick={() => navigate('/produtos')}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ fontSize: '10px', padding: '5px 12px' }}
+          >
+            Ver todos →
+          </motion.button>
         </div>
 
         {loading ? (

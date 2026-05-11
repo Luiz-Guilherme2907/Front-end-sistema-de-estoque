@@ -225,7 +225,7 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s ease;
-  border-radius: 2px;
+  border-radius: 8px;
   white-space: nowrap;
 }
 .btn-amber:hover   { background: hsl(43 95% 48%); }
@@ -251,7 +251,7 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s ease;
-  border-radius: 2px;
+  border-radius: 8px;
   white-space: nowrap;
 }
 .btn-ghost:hover {
@@ -275,7 +275,7 @@
   padding: 6px 10px;
   cursor: pointer;
   transition: all 0.15s ease;
-  border-radius: 2px;
+  border-radius: 8px;
   font-family: 'Martian Mono', monospace;
   font-size: 12px;
 }
@@ -295,7 +295,7 @@
   padding: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 .btn-icon:hover {
   color: hsl(var(--foreground));
@@ -314,8 +314,8 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 2px;
+  padding: 3px 10px;
+  border-radius: 20px;
 }
 
 .badge-active {
@@ -347,7 +347,8 @@
 .panel {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 2px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -411,7 +412,7 @@
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   padding: 20px 22px;
-  border-radius: 2px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
   transition: border-color 0.2s ease;
@@ -434,7 +435,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: 2px;
+  border-radius: 8px;
   font-family: 'Syne', sans-serif;
   font-size: 10.5px;
   font-weight: 500;
@@ -469,7 +470,7 @@ html.light [data-slot="dialog-overlay"] {
 [data-slot="dialog-content"] {
   background: hsl(var(--popover)) !important;
   border: 1px solid hsl(var(--border)) !important;
-  border-radius: 3px !important;
+  border-radius: 16px !important;
   box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
 }
 
@@ -490,7 +491,7 @@ html.light [data-slot="dialog-overlay"] {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   padding: 12px 14px;
-  border-radius: 2px;
+  border-radius: 10px;
   cursor: pointer;
   text-align: left;
   transition: all 0.15s ease;
@@ -514,10 +515,10 @@ html.light [data-slot="dialog-overlay"] {
 
 .page-title {
   font-family: 'Syne', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
   color: hsl(var(--foreground));
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
@@ -537,7 +538,7 @@ html.light [data-slot="dialog-overlay"] {
   border: 1px solid hsl(var(--destructive) / 0.3);
   background: hsl(var(--destructive) / 0.07);
   padding: 10px 14px;
-  border-radius: 2px;
+  border-radius: 8px;
   animation: fadeIn 0.25s ease-out;
 }
 

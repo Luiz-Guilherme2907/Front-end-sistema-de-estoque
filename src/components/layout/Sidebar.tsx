@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ArrowLeftRight, LogOut, Sun, Moon } from 'lucide-react'
+import { LayoutDashboard, Package, ArrowLeftRight, LogOut, Sun, Moon, UserCircle } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -17,6 +17,7 @@ const navItems: DockItem[] = [
   { to: '/dashboard',      icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/produtos',       icon: Package,         label: 'Produtos' },
   { to: '/movimentacoes',  icon: ArrowLeftRight,  label: 'Movimentações' },
+  { to: '/perfil',         icon: UserCircle,      label: 'Perfil' },
   { icon: LogOut,          label: 'Sair',         danger: true },
 ]
 
