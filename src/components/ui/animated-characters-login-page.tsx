@@ -530,4 +530,5 @@ function LoginPage() {
   )
 }
 
+export { Pupil, EyeBall, useBlink }
 export const Component = LoginPage

@@ -1,8 +1,9 @@
 import { useState, useRef, useLayoutEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ArrowLeftRight, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, ArrowLeftRight, LogOut, Sun, Moon } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 type DockItem = {
   to?: string
@@ -23,6 +24,7 @@ export function Sidebar() {
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
 
   const activeIndex = navItems.findIndex(item => item.to && location.pathname.startsWith(item.to))
 
@@ -70,6 +72,34 @@ export function Sidebar() {
           boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)',
         }}
       >
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
+          style={{
+            position: 'relative',
+            zIndex: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '56px',
+            height: '100%',
+            background: 'transparent',
+            border: 'none',
+            borderRight: `1px solid ${border}`,
+            marginRight: '4px',
+            paddingRight: '4px',
+            cursor: 'pointer',
+            color: muted,
+            opacity: 0.5,
+            transition: 'opacity 0.15s ease, color 0.15s ease',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.85')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.5')}
+        >
+          {theme === 'dark' ? <Sun size={18} strokeWidth={2} /> : <Moon size={18} strokeWidth={2} />}
+        </button>
+
         {navItems.map(({ to, icon: Icon, label, onClick, danger }, index) => {
           const isActive = index === activeIndex
           const color = danger ? destructive : isActive ? amber : muted
